@@ -7,6 +7,7 @@ import { EdificiosModule } from './edificios/edificios';
 import { EspaciosModule } from './espacios/espacios';
 import { ReservasModule } from './reservas/reservas';
 import { AuditoriaModule } from './auditoria/auditoria';
+import { PanelModule } from './panel/panel';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -22,6 +23,7 @@ import { HealthController } from './health/health.controller';
     EspaciosModule,
     ReservasModule,
     AuditoriaModule,
+    PanelModule,
   ],
   controllers: [HealthController],
 })
