@@ -153,6 +153,25 @@ El backend espera a que ambas bases estén sanas, aplica migraciones y carga los
 
 Detener: `docker compose down` (agregar `-v` para borrar los datos).
 
+**Swagger:** en http://localhost:3000/docs ejecutar `POST /auth/login`, copiar el `token` y pegarlo en "Authorize".
+
+**Ver las bases de datos:**
+
+```bash
+# PostgreSQL (dentro de psql: \dt, SELECT id, nombre, correo, rol FROM "Usuario"; \q)
+docker compose exec postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+# MongoDB (auditoría de reservas)
+docker compose exec mongo mongosh espacios_auditoria --eval "db.getCollectionNames()"
+```
+
+También sirven DBeaver/pgAdmin en `localhost:5432` y MongoDB Compass en `mongodb://localhost:27017`.
+
+**Problemas frecuentes:**
+
+- Docker Desktop debe estar abierto antes de `docker compose up`.
+- Si el login falla después de cambiar claves del seed, la base ya existente conserva la clave anterior (el seed no sobrescribe usuarios): `docker compose down -v` y volver a levantar.
+- Generar un hash de clave nuevo: `docker compose exec frontend node scripts/generarHash.js MiClave123` y pegarlo en `backend/prisma/data/usuarios.json`.
+
 ## Pruebas y verificación
 
 - Lint y build del frontend sin errores (dentro del contenedor: `docker compose exec frontend npx eslint src`).
