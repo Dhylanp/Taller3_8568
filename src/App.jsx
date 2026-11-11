@@ -4,6 +4,9 @@ import RutaProtegida from './components/RutaProtegida'
 import Login from './pages/Login'
 import Salas from './pages/Salas'
 import MisReservas from './pages/MisReservas'
+import Solicitudes from './pages/Solicitudes'
+import AdminEspacios from './pages/AdminEspacios'
+import Panel from './pages/Panel'
 
 function App() {
   return (
@@ -14,6 +17,9 @@ function App() {
         <Route element={<RutaProtegida><Layout /></RutaProtegida>}>
           <Route path="/salas" element={<Salas />} />
           <Route path="/mis-reservas" element={<MisReservas />} />
+          <Route path="/admin/solicitudes" element={<RutaProtegida soloAdmin><Solicitudes /></RutaProtegida>} />
+          <Route path="/admin/espacios" element={<RutaProtegida soloAdmin><AdminEspacios /></RutaProtegida>} />
+          <Route path="/admin/panel" element={<RutaProtegida soloAdmin><Panel /></RutaProtegida>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/salas" replace />} />

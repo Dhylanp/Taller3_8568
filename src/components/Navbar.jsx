@@ -2,12 +2,10 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { useAuth } from '../context/AuthContext'
-import { useReservas } from '../context/ReservasContext'
 
 function Navbar() {
   const [abierto, setAbierto] = useState(false)
-  const { usuario, logout } = useAuth()
-  const { misReservas } = useReservas()
+  const { usuario, logout, esAdmin } = useAuth()
   const navigate = useNavigate()
 
   const cerrarMenu = () => setAbierto(false)
@@ -53,13 +51,21 @@ function Navbar() {
             <li className="nav-item">
               <NavLink to="/mis-reservas" className="nav-link" onClick={cerrarMenu}>
                 Mis reservas
-                {misReservas.length > 0 && (
-                  <span className="badge rounded-pill badge-contador ms-2">
-                    {misReservas.length}
-                  </span>
-                )}
               </NavLink>
             </li>
+            {esAdmin && (
+              <>
+                <li className="nav-item">
+                  <NavLink to="/admin/solicitudes" className="nav-link" onClick={cerrarMenu}>Solicitudes</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/espacios" className="nav-link" onClick={cerrarMenu}>Espacios</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/admin/panel" className="nav-link" onClick={cerrarMenu}>Panel</NavLink>
+                </li>
+              </>
+            )}
             <li className="nav-item navbar-usuario">{usuario.nombre}</li>
             <li className="nav-item">
               <button className="btn btn-salir" onClick={handleCerrarSesion}>

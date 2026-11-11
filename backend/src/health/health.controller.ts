@@ -3,7 +3,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { PrismaService } from '../prisma/prisma.service';
+import { Public } from '../auth/decorators';
 
+@Public()
 @ApiTags('health')
 @Controller('health')
 export class HealthController {

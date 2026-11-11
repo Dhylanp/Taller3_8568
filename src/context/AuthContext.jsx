@@ -18,13 +18,14 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ usuario, login, logout }}>
+    <AuthContext.Provider value={{ usuario, login, logout, esAdmin: usuario?.rol === "ADMIN" }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }
