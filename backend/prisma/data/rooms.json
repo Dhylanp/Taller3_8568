@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "nombre": "Laboratorio de Computación 206",
+    "tipo": "Laboratorio",
+    "edificio": "Torre A",
+    "piso": 2,
+    "capacidad": 30,
+    "descripcion": "Equipado con 30 PCs, proyector y aire acondicionado.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 2,
+    "nombre": "Auditorio Amarillo 001",
+    "tipo": "Auditorio",
+    "edificio": "Torre C",
+    "piso": -1,
+    "capacidad": 120,
+    "descripcion": "Sistema de audio profesional, micrófono inalámbrico y proyector.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 3,
+    "nombre": "Box 1",
+    "tipo": "Sala de Estudio",
+    "edificio": "Torre B",
+    "piso": -1,
+    "capacidad": 8,
+    "descripcion": "Pizarra acrílica, enchufes individuales y mesa de trabajo grupal.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 4,
+    "nombre": "Laboratorio de Computación 306",
+    "tipo": "Laboratorio",
+    "edificio": "Torre A",
+    "piso": 3,
+    "capacidad": 30,
+    "descripcion": "Equipado con 30 PCs, proyector y aire acondicionado.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 5,
+    "nombre": "Box 2",
+    "tipo": "Sala de Estudio",
+    "edificio": "Torre B",
+    "piso": -1,
+    "capacidad": 8,
+    "descripcion": "Pizarra acrílica, enchufes individuales y mesa de trabajo grupal.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 6,
+    "nombre": "Auditorio Verde 002",
+    "tipo": "Auditorio",
+    "edificio": "Torre C",
+    "piso": -1,
+    "capacidad": 120,
+    "descripcion": "Sistema de audio profesional, micrófono inalámbrico y proyector.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 7,
+    "nombre": "Sal-112",
+    "tipo": "Sala Pequeña",
+    "edificio": "Torre C",
+    "piso": 1,
+    "capacidad": 15,
+    "descripcion": "Equipada con proyector y aire acondicionado.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 8,
+    "nombre": "Sal-525",
+    "tipo": "Sala Mediana",
+    "edificio": "Torre C",
+    "piso": 5,
+    "capacidad": 45,
+    "descripcion": "Equipada con proyector y aire acondicionado.",
+    "hapioResourceId": null
+  },
+  {
+    "id": 9,
+    "nombre": "Sal-706",
+    "tipo": "Sala Mediana",
+    "edificio": "Torre A",
+    "piso": 7,
+    "capacidad": 45,
+    "descripcion": "Equipada con proyector y aire acondicionado.",
+    "hapioResourceId": null
+  }
+]
