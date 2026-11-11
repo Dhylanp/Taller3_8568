@@ -24,6 +24,11 @@ const incluir = {
 };
 const ACTIVAS: EstadoReserva[] = ['PENDIENTE', 'APROBADA'];
 
+// Las horas se guardan "tal como se envían" (sin zona). Para compararlas con el reloj hay que usar la hora de Chile, no UTC.
+function ahoraChile(): Date {
+  return new Date(new Date().toLocaleString('sv-SE', { timeZone: 'America/Santiago' }).replace(' ', 'T') + 'Z');
+}
+
 @Injectable()
 export class ReservasService {
   constructor(private prisma: PrismaService, private auditoria: AuditoriaService) {}
@@ -32,7 +37,7 @@ export class ReservasService {
     const inicio = new Date(dto.inicio);
     const fin = new Date(dto.fin);
     if (fin <= inicio) throw new BadRequestException('La hora de término debe ser posterior al inicio');
-    if (inicio < new Date()) throw new BadRequestException('No se puede reservar en el pasado');
+    if (inicio < ahoraChile()) throw new BadRequestException('No se puede reservar en el pasado');
     const espacio = await this.prisma.espacio.findUnique({ where: { id: dto.espacioId } });
     if (!espacio) throw new NotFoundException('Espacio no encontrado');
     if (!espacio.disponible) throw new ConflictException('El espacio no está disponible para reservas');
