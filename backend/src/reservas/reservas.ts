@@ -4,6 +4,7 @@ import { EstadoReserva, Prisma } from '@prisma/client';
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { PrismaService } from '../prisma/prisma.service';
 import { Roles, UsuarioActual } from '../auth/decorators';
+import { Accion, AuditoriaModule, AuditoriaService } from '../auditoria/auditoria';
 
 export class ReservaDto {
   @ApiProperty() @IsInt() espacioId: number;
@@ -25,7 +26,7 @@ const ACTIVAS: EstadoReserva[] = ['PENDIENTE', 'APROBADA'];
 
 @Injectable()
 export class ReservasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private auditoria: AuditoriaService) {}
 
   async crear(u: Actual, dto: ReservaDto) {
     const inicio = new Date(dto.inicio);
@@ -38,7 +39,7 @@ export class ReservasService {
 
     try {
       // Serializable: dos solicitudes simultáneas al mismo tramo no pueden pasar ambas
-      return await this.prisma.$transaction(async tx => {
+      const creada = await this.prisma.$transaction(async tx => {
         const choque = await tx.reserva.findFirst({
           where: { espacioId: dto.espacioId, estado: { in: ACTIVAS }, inicio: { lt: fin }, fin: { gt: inicio } },
         });
@@ -48,6 +49,8 @@ export class ReservasService {
           include: incluir,
         });
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+      await this.auditoria.registrar('CREADA', u, creada);
+      return creada;
     } catch (e: any) {
       if (e.code === 'P2034') throw new ConflictException('Conflicto de horario: intenta nuevamente');
       throw e;
@@ -68,19 +71,21 @@ export class ReservasService {
     return r;
   }
 
-  private async cambiar(id: number, desde: EstadoReserva[], hacia: EstadoReserva) {
+  private async cambiar(id: number, desde: EstadoReserva[], hacia: EstadoReserva, accion: Accion, actor: Actual) {
     const r = await this.cargar(id);
     if (!desde.includes(r.estado)) throw new ConflictException(`No se puede pasar de ${r.estado} a ${hacia}`);
-    return this.prisma.reserva.update({ where: { id }, data: { estado: hacia }, include: incluir });
+    const nueva = await this.prisma.reserva.update({ where: { id }, data: { estado: hacia }, include: incluir });
+    await this.auditoria.registrar(accion, actor, nueva);
+    return nueva;
   }
 
-  aprobar(id: number) { return this.cambiar(id, ['PENDIENTE'], 'APROBADA'); }
-  rechazar(id: number) { return this.cambiar(id, ['PENDIENTE'], 'RECHAZADA'); }
+  aprobar(id: number, a: Actual) { return this.cambiar(id, ['PENDIENTE'], 'APROBADA', 'APROBADA', a); }
+  rechazar(id: number, a: Actual) { return this.cambiar(id, ['PENDIENTE'], 'RECHAZADA', 'RECHAZADA', a); }
 
   async cancelar(id: number, u: Actual) {
     const r = await this.cargar(id);
     if (r.usuarioId !== u.id && u.rol !== 'ADMIN') throw new ForbiddenException('Solo puedes cancelar tus propias reservas');
-    return this.cambiar(id, ACTIVAS, 'CANCELADA');
+    return this.cambiar(id, ACTIVAS, 'CANCELADA', 'CANCELADA', u);
   }
 }
 
@@ -92,10 +97,10 @@ export class ReservasController {
   @Post() crear(@UsuarioActual() u: Actual, @Body() dto: ReservaDto) { return this.s.crear(u, dto); }
   @Get('mias') mias(@UsuarioActual() u: Actual) { return this.s.mias(u); }
   @Roles('ADMIN') @Get() todas(@Query() f: FiltroReservas) { return this.s.todas(f); }
-  @Roles('ADMIN') @Patch(':id/aprobar') aprobar(@Param('id', ParseIntPipe) id: number) { return this.s.aprobar(id); }
-  @Roles('ADMIN') @Patch(':id/rechazar') rechazar(@Param('id', ParseIntPipe) id: number) { return this.s.rechazar(id); }
+  @Roles('ADMIN') @Patch(':id/aprobar') aprobar(@Param('id', ParseIntPipe) id: number, @UsuarioActual() u: Actual) { return this.s.aprobar(id, u); }
+  @Roles('ADMIN') @Patch(':id/rechazar') rechazar(@Param('id', ParseIntPipe) id: number, @UsuarioActual() u: Actual) { return this.s.rechazar(id, u); }
   @Patch(':id/cancelar') cancelar(@Param('id', ParseIntPipe) id: number, @UsuarioActual() u: Actual) { return this.s.cancelar(id, u); }
 }
 
-@Module({ providers: [ReservasService], controllers: [ReservasController] })
+@Module({ imports: [AuditoriaModule], providers: [ReservasService], controllers: [ReservasController] })
 export class ReservasModule {}
