@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { EdificiosModule } from './edificios/edificios';
 import { EspaciosModule } from './espacios/espacios';
 import { ReservasModule } from './reservas/reservas';
+import { AuditoriaModule } from './auditoria/auditoria';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -20,6 +21,7 @@ import { HealthController } from './health/health.controller';
     EdificiosModule,
     EspaciosModule,
     ReservasModule,
+    AuditoriaModule,
   ],
   controllers: [HealthController],
 })
