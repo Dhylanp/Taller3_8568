@@ -5,18 +5,20 @@ export function hoyISO() {
   return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`
 }
 
-export function horaActual() {
-  const d = new Date()
-  return `${dos(d.getHours())}:${dos(d.getMinutes())}`
-}
-
 // "2026-10-15" -> "15/10/2026"
 export function formatearFecha(iso) {
-  const [anio, mes, dia] = iso.split('-')
+  const [anio, mes, dia] = iso.slice(0, 10).split('-')
   return `${dia}/${mes}/${anio}`
 }
 
-// "08:00 - 09:00" -> "08:00"
-export function horaInicio(horario) {
-  return horario.slice(0, 5)
+// La API guarda la hora tal como se envió (sin zona), así que se muestra el texto ISO sin convertir
+export const fechaDe = (iso) => formatearFecha(iso)
+export const horaDe = (iso) => iso.slice(11, 16)
+export const rangoHora = (r) => `${horaDe(r.inicio)} - ${horaDe(r.fin)}`
+
+export const ESTADOS = {
+  PENDIENTE: 'warning',
+  APROBADA: 'success',
+  RECHAZADA: 'danger',
+  CANCELADA: 'secondary',
 }

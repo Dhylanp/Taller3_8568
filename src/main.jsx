@@ -6,14 +6,11 @@ import './styles/auth.css'
 import './styles/reservas.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
-import { ReservasProvider } from './context/ReservasContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <ReservasProvider>
-        <App />
-      </ReservasProvider>
+      <App />
     </AuthProvider>
   </StrictMode>,
 )
