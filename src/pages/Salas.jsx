@@ -1,77 +1,59 @@
 import { useMemo, useState } from 'react'
-import rooms from '../data/rooms.json'
+import { useApi } from '../hooks'
 import RoomList from '../components/RoomList'
 import FiltroSalas from '../components/FiltroSalas'
 import ReservationModal from '../components/ReservationModal'
+import Estado from '../components/Estado'
 
 // Quita tildes y pasa a minúsculas: "Computación" -> "computacion"
-const normalizar = (texto) =>
-  texto
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-
-// Opciones de los selects, tomadas de rooms.json
-const tipos = [...new Set(rooms.map((r) => r.tipo))].sort((a, b) =>
-  a.localeCompare(b, 'es')
-)
-const edificios = [...new Set(rooms.map((r) => r.edificio))].sort((a, b) =>
-  a.localeCompare(b, 'es')
-)
+const normalizar = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+const ordenar = (lista) => [...new Set(lista)].sort((a, b) => a.localeCompare(b, 'es'))
 
 function Salas() {
+  const { datos: espacios, cargando, error, recargar } = useApi('/espacios')
   const [salaSeleccionada, setSalaSeleccionada] = useState(null)
   const [tipo, setTipo] = useState('')
   const [edificio, setEdificio] = useState('')
   const [busqueda, setBusqueda] = useState('')
 
-  const roomsFiltradas = useMemo(() => {
-    const texto = normalizar(busqueda.trim())
+  const tipos = useMemo(() => ordenar((espacios ?? []).map((r) => r.tipo)), [espacios])
+  const edificios = useMemo(() => ordenar((espacios ?? []).map((r) => r.edificio.nombre)), [espacios])
 
-    return rooms.filter(
-      (room) =>
-        (tipo === '' || room.tipo === tipo) &&
-        (edificio === '' || room.edificio === edificio) &&
-        normalizar(room.descripcion).includes(texto)
-    )
-  }, [tipo, edificio, busqueda])
+  const filtradas = useMemo(() => {
+    const texto = normalizar(busqueda.trim())
+    return (espacios ?? []).filter((r) => {
+      const contenido = normalizar(
+        [r.nombre, r.descripcion ?? '', ...r.equipamiento.map((e) => e.equipamiento.nombre)].join(' ')
+      )
+      return (
+        (tipo === '' || r.tipo === tipo) &&
+        (edificio === '' || r.edificio.nombre === edificio) &&
+        contenido.includes(texto)
+      )
+    })
+  }, [espacios, tipo, edificio, busqueda])
 
   const hayFiltros = tipo !== '' || edificio !== '' || busqueda.trim() !== ''
-
-  const limpiarFiltros = () => {
-    setTipo('')
-    setEdificio('')
-    setBusqueda('')
-  }
 
   return (
     <div className="container mt-4">
       <h1 className="h3 fw-bold mb-4">Salas disponibles</h1>
-
-      <FiltroSalas
-        tipos={tipos}
-        edificios={edificios}
-        tipo={tipo}
-        onTipo={setTipo}
-        edificio={edificio}
-        onEdificio={setEdificio}
-        busqueda={busqueda}
-        onBusqueda={setBusqueda}
-        hayFiltros={hayFiltros}
-        onLimpiar={limpiarFiltros}
-      />
-
-      <RoomList
-        rooms={roomsFiltradas}
-        onReservar={setSalaSeleccionada}
-      />
-
+      <Estado cargando={cargando} error={error} onReintentar={recargar} />
+      {espacios && (
+        <>
+          <FiltroSalas
+            tipos={tipos} edificios={edificios}
+            tipo={tipo} onTipo={setTipo}
+            edificio={edificio} onEdificio={setEdificio}
+            busqueda={busqueda} onBusqueda={setBusqueda}
+            hayFiltros={hayFiltros}
+            onLimpiar={() => { setTipo(''); setEdificio(''); setBusqueda('') }}
+          />
+          <RoomList rooms={filtradas} onReservar={setSalaSeleccionada} />
+        </>
+      )}
       {salaSeleccionada && (
-        <ReservationModal
-          key={salaSeleccionada.id}
-          room={salaSeleccionada}
-          onCerrar={() => setSalaSeleccionada(null)}
-        />
+        <ReservationModal key={salaSeleccionada.id} room={salaSeleccionada} onCerrar={() => setSalaSeleccionada(null)} />
       )}
     </div>
   )

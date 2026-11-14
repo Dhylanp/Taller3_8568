@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  ESTUDIANTE
+  ADMIN
+}
+
+enum EstadoReserva {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  CANCELADA
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  correo    String    @unique
+  claveHash String
+  rol       Rol       @default(ESTUDIANTE)
+  reservas  Reserva[]
+}
+
+model Edificio {
+  id       Int       @id @default(autoincrement())
+  nombre   String    @unique
+  espacios Espacio[]
+}
+
+model Espacio {
+  id           Int                  @id @default(autoincrement())
+  nombre       String
+  tipo         String
+  piso         Int
+  capacidad    Int
+  descripcion  String?
+  disponible   Boolean              @default(true)
+  edificioId   Int
+  edificio     Edificio             @relation(fields: [edificioId], references: [id])
+  equipamiento EspacioEquipamiento[]
+  reservas     Reserva[]
+
+  @@unique([edificioId, nombre])
+}
+
+model Equipamiento {
+  id       Int                   @id @default(autoincrement())
+  nombre   String                @unique
+  espacios EspacioEquipamiento[]
+}
+
+model EspacioEquipamiento {
+  espacioId      Int
+  equipamientoId Int
+  cantidad       Int          @default(1)
+  espacio        Espacio      @relation(fields: [espacioId], references: [id], onDelete: Cascade)
+  equipamiento   Equipamiento @relation(fields: [equipamientoId], references: [id])
+
+  @@id([espacioId, equipamientoId])
+}
+
+model Reserva {
+  id        Int           @id @default(autoincrement())
+  usuarioId Int
+  espacioId Int
+  inicio    DateTime
+  fin       DateTime
+  motivo    String?
+  estado    EstadoReserva @default(PENDIENTE)
+  creadaEn  DateTime      @default(now())
+  usuario   Usuario       @relation(fields: [usuarioId], references: [id])
+  espacio   Espacio       @relation(fields: [espacioId], references: [id])
+
+  @@index([espacioId, inicio, fin])
+}
