@@ -10,5 +10,11 @@
     "nombre": "Estudiante Demo",
     "correo": "estudiante@unab.cl",
     "claveHash": "$2b$10$jT7FFT/kPnxMcMxIMDGVuudZXouMiWJIfqx1aK0rGpZ2dqwkUaLn."
-  }
+  },
+  {
+  "id": 3,
+  "nombre": "Admin",
+  "correo": "admin@unab.cl",
+  "claveHash": "$2b$10$u.M8XD.J.LNEFGZiT3ktR.JH3MBQOXumf8Yo7vp1k4MiELTgxMsbC"
+}
 ]
