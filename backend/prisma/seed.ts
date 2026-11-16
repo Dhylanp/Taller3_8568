@@ -16,7 +16,7 @@ async function main() {
         nombre: u.nombre,
         correo: u.correo,
         claveHash: u.claveHash,
-        rol: u.correo === 'dhylan@unab.cl' ? Rol.ADMIN : Rol.ESTUDIANTE,
+        rol: (u.correo === 'dhylan@unab.cl' || u.correo === 'manuel@unab.cl') ? Rol.ADMIN : Rol.ESTUDIANTE,
       },
     });
   }
